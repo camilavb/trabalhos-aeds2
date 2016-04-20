@@ -1,0 +1,135 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "cliente.h"
+
+#define CHEGADA 1
+
+
+int num_clientes_entraram(Cliente *clientes, int max_clientes){
+	int i=0, total=0;
+	for(i=1; i<=max_clientes; i++){
+		if(clientes[i].status == ATENDIDO ||clientes[i].status == NAFILA || clientes[i].status == DESISTENTE || clientes[i].status == SAIU){
+			total++;
+		}
+	}
+	return total;
+}
+
+void imprime(Cliente *clientes, int max_clientes)
+{
+	printf("Quantidade de clientes que entraram: %d\n", num_clientes_entraram(clientes, max_clientes));
+}
+
+//tem q usar argv
+void leArquivo(char *nomeArquivo)
+{
+	FILE* arquivo= fopen(nomeArquivo, "r");
+
+	if(arquivo == NULL)	
+	{
+		printf("Nao eh possivel abrir o arquivo.");
+		return ;
+	}
+	
+	int max_clientes=0; //numero maximo de clientes q serao registrados
+	int operacao=0, i=0, hora, min, num_cliente;
+	float gasto;
+	Cliente *clientes;
+	
+
+	fscanf(arquivo, "%d", &max_clientes);
+	clientes = (Cliente*)calloc (max_clientes+1,sizeof(Cliente));//calloc zera a memoria
+
+	while(!feof(arquivo))
+	{
+		fscanf(arquivo, "%d", &operacao);
+
+		switch(operacao){
+			case CHEGADA: 
+				fscanf(arquivo, "%d:%d %d %f", &hora, &min, &num_cliente, &gasto);
+				clientes[num_cliente].hora_chegada = 60*hora+min;
+				clientes[num_cliente].gasto = gasto;
+				clientes[num_cliente].status = NAFILA;
+
+			break;
+
+			case 2: //atendimento do cliente
+				fscanf(arquivo, "%d:%d %d", &hora, &min, &num_cliente);
+				clientes[num_cliente].hora_atendido = 60*hora+min;
+				clientes[num_cliente].status = ATENDIDO;
+			break;
+
+			case 3: //saida apos atendimento
+				fscanf(arquivo, "%d:%d %d", &hora, &min, &num_cliente);
+				clientes[num_cliente].hora_saida = 60*hora+min;
+				clientes[num_cliente].status = SAIU;
+			break; 
+
+			case 4: //desistencia
+				fscanf(arquivo, "%d:%d %d", &hora, &min, &num_cliente);
+				clientes[num_cliente].hora_desistiu = 60*hora+min;
+				clientes[num_cliente].status = DESISTENTE;
+			break;
+
+			case 5: 
+		 		//imprimir relatorio;
+				imprime(clientes, max_clientes);
+			break;
+
+			case 6: 
+		 		//sair do sistema
+			break;
+
+			default: 
+			break; //fazer;
+		}
+		
+	}
+
+	free(clientes);
+	fclose(arquivo);
+}
+
+
+
+int main(int argc, char **argv)
+{
+	int i;
+
+	for(i = 0; i < argc; i++)
+		printf("%d %s\n", i, argv[i]);
+	printf("\n");
+	if(argc != 3){
+		printf("ERROOOOOO!!!!!!!Numero de argumentos incorreto\n");
+		exit(1);
+	}
+
+	leArquivo(argv[1]);
+	return 0;
+}
+/*
+
+void statusCliente(){
+	//criar array de clientes atendidos e desistentes
+	if(cliente.status == "a"){
+		//colocar no array de clientes atendidos
+	}else{
+		//colocar no array de clientes desistentes		
+	}
+}
+
+void calculaHora(clientes, hora){
+	for(int i=0; i<clientes; i++){
+		int horaTotal+= (Cliente->hora_saida - Cliente->hora_chegada);
+	}	
+}
+
+void calculaGasto(cliente, gasto){
+	
+	for(int i=0; i<clientes; i++){
+		int valorTotal+= (ClienteA->gasto);
+	}	
+}
+
+*/ 
+
