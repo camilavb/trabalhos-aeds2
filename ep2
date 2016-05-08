@@ -1,0 +1,194 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include "BigNum.h"
+
+void criaBigNum(BigNum *num){
+	num->primeiro = NULL; 
+}
+void addAlgarismo(BigNum *num, Algarismo algarismoNovo){
+	
+	Apontador celulaNova = (Apontador) malloc(sizeof(TCelula));
+	celulaNova->algarismo = algarismoNovo;
+	celulaNova->proximo = num->primeiro;
+	num->primeiro = celulaNova;
+}
+
+void imprimeNum(BigNum *num){
+
+	Apontador lista = num->primeiro;
+	
+	while(lista != NULL){
+		printf("%d ", lista->algarismo);
+		lista = lista->proximo;
+	}
+	printf("\n");
+}//mudei de celula para lista
+
+void inverteNum(BigNum *num){
+
+	Apontador celula = num->primeiro;
+	BigNum numInvert;
+	criaBigNum(&numInvert);
+	
+	while(celula != NULL){
+		addAlgarismo(&numInvert, celula->algarismo);
+		celula = celula->proximo;
+	}
+	
+	num->primeiro = numInvert.primeiro;
+}
+
+
+void somaBigNum(BigNum *num1, BigNum *num2, BigNum *resultado){
+	Apontador apont1 = num1->primeiro;
+	Apontador apont2 = num2->primeiro;
+	Algarismo temp, vaiX=0;
+
+	while(apont1 != NULL || apont2 != NULL){
+
+		if(apont1 != NULL && apont2 != NULL){
+			//printf("%d + ", apont1->algarismo);
+			//printf("%d \n", apont2->algarismo);
+
+			temp = (apont1->algarismo + apont2->algarismo);
+		}
+		else if(apont1 != NULL){
+			//printf("%d + ", apont1->algarismo);
+			//printf("%d \n", 0);
+			temp = apont1->algarismo;
+		}
+		else if(apont2 != NULL){
+			//printf("%d + ", 0);
+			//printf("%d \n", apont2->algarismo);
+			temp = apont2->algarismo;
+		}
+
+		temp += vaiX;
+
+		addAlgarismo(resultado, temp%10);
+		vaiX = temp/10;
+
+		if(apont1 != NULL){
+			apont1 = apont1->proximo;
+		}
+		if(apont2 != NULL){
+			apont2 = apont2->proximo;
+		}
+		//funcao inverte algarismo
+	}
+
+	inverteNum(resultado);
+
+}
+
+void subtraiBigNum(BigNum *num1, BigNum *num2, BigNum *resultado){
+	Apontador apont1 = num1->primeiro;
+	Apontador apont2 = num2->primeiro;
+	Algarismo temp;
+	int tamanho1=0, tamanho2=0;
+	
+	while(apont1 != NULL){
+
+		tamanho1++;
+		apont1 = apont1->proximo;
+	}
+
+	while(apont2 != NULL){
+	
+		tamanho2++;
+		apont2 = apont2->proximo;
+	}
+	apont1 = num1->primeiro;
+	apont2 = num2->primeiro;
+	if(tamanho1 >= tamanho2){	
+		
+		while(apont1 != NULL || apont2 != NULL){			
+
+			if(apont1 != NULL && apont2 != NULL){
+				
+				if (apont1->algarismo >= apont2->algarismo){
+					temp = (apont1->algarismo - apont2->algarismo);
+
+				}else{
+					apont1->algarismo = apont1->algarismo + 10;
+					temp = (apont1->algarismo - apont2->algarismo);
+					apont1->proximo->algarismo =  apont1->proximo->algarismo - 1;  
+				}
+
+			}else if(apont1 != NULL){
+
+				temp = apont1->algarismo;
+			}else if(apont2 != NULL){
+				temp = apont2->algarismo;
+			}
+
+			addAlgarismo(resultado, temp);
+			if(apont1 != NULL){
+				apont1 = apont1->proximo;
+			}
+			if(apont2 != NULL){
+				apont2 = apont2->proximo;
+			}
+		}	
+	}else{
+		printf("Nao eh possivel efetuar a conta, numero 1 menor que numero 2\n");
+	}
+	
+	inverteNum(resultado);
+}
+
+int main(){
+	BigNum numero1, numero2, resultado;
+	BigNum numero3, numero4, resultado2;
+
+	criaBigNum(&numero1);
+	criaBigNum(&numero2);
+	criaBigNum(&resultado);
+	
+	criaBigNum(&numero3);
+	criaBigNum(&numero4);
+	criaBigNum(&resultado2);
+
+	addAlgarismo(&numero1, 2);
+	addAlgarismo(&numero1, 9);
+	addAlgarismo(&numero1, 6);
+
+	addAlgarismo(&numero2, 8);
+	addAlgarismo(&numero2, 4);
+	addAlgarismo(&numero2, 1);
+	addAlgarismo(&numero2, 4);
+
+	addAlgarismo(&numero3, 8);
+	addAlgarismo(&numero3, 1);
+	addAlgarismo(&numero3, 1);
+	addAlgarismo(&numero3, 4);
+
+	addAlgarismo(&numero4, 2);
+	addAlgarismo(&numero4, 9);
+	addAlgarismo(&numero4, 6);
+
+	printf("Numero 1: ");
+	imprimeNum(&numero1);
+	printf("Numero 2: ");
+	imprimeNum(&numero2);
+	printf("Resultado soma: ");
+	somaBigNum(&numero1, &numero2, &resultado);
+	inverteNum(&resultado);
+	imprimeNum(&resultado);
+	printf("\n\n");
+
+	printf("Numero 3: ");
+	imprimeNum(&numero3);	
+	printf("Numero 4: ");
+	imprimeNum(&numero4);
+	printf("Resultado subtracao: ");
+	subtraiBigNum (&numero3, &numero4, &resultado2);
+	inverteNum(&resultado2);
+	imprimeNum(&resultado2);
+
+	
+	
+	//imprimeInvertido(&resultado);
+
+	return 0;
+}
